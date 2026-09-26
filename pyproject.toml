@@ -1,0 +1,49 @@
+[project]
+name = "coderouter-plugin-localjev"
+version = "0.2.0"
+description = "CodeRouter plugin: consult githubnext/localjev (Jev System One) to annotate and route requests"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "zephel01" }]
+keywords = ["coderouter", "plugin", "jev", "localjev", "typesafe"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "ruff>=0.7.0",
+]
+
+# Two groups, one class. The loader instantiates the class once per group,
+# so the two instances are distinct objects — the decision is shared through
+# a class-level store (see plugin.py). Drop the observer line if you only
+# want routing and no correlation log.
+[project.entry-points."coderouter.input_filter"]
+localjev = "coderouter_plugin_localjev.plugin:LocalJevPlugin"
+
+[project.entry-points."coderouter.observer"]
+localjev = "coderouter_plugin_localjev.plugin:LocalJevPlugin"
+
+[project.urls]
+Homepage = "https://github.com/zephel01/coderouter-plugin-localjev"
+"LocalJev" = "https://github.com/githubnext/localjev"
+"CodeRouter" = "https://github.com/zephel01/CodeRouter"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["coderouter_plugin_localjev"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

@@ -1,0 +1,59 @@
+# ~/.coderouter/providers.yaml に貼る最小構成
+#
+#   Claude Code → CodeRouter :8088
+#                    │  InputFilter localjev → LocalJev :8080 → llama-server :8000
+#                    ▼
+#                 profile (coding / reasoning / general)
+#
+# 前提: LocalJev が起動していて `curl http://127.0.0.1:8080/ready` が
+#       {"status":"ready",...} を返すこと。503 のときは upstream の
+#       /v1/models に LOCALJEV_UPSTREAM_MODEL と同じ id が無い。
+
+plugins:
+  enabled:
+    - localjev
+  config:
+    localjev:
+      base_url: http://127.0.0.1:8080
+      # LocalJev 側で LOCALJEV_API_KEY を設定したときだけ必要。
+      # 設定していない LocalJev に鍵を送っても無視される（検証しない）。
+      api_key: ""
+      model: jev-latest
+      timeout_s: 20          # 実モデルでは 4 質問で数百 ms〜数秒。足りなければ上げる
+      fail_open: true        # LocalJev が落ちていても素通しする
+      first_user_only: true  # 2 ターン目以降は呼ばない（毎ターンの遅延を避ける）
+      inject: true           # 判定を system に足す
+      inject_position: append  # prepend は prompt cache の prefix を壊すので既定は append
+      set_profile: true      # route choice → request.profile
+      min_confidence: 0.0    # 例: 0.2 にすると弱い判定では profile を変えない
+      # ★重要: ここに書いた名前だけを profile に採用する。
+      #   providers.yaml に無い profile を渡すと chain 解決時に
+      #   KeyError（HTTP 500）になるため、必ず下の profiles と揃える。
+      profiles_available: [coding, reasoning, general]
+      profile_map:
+        coding: coding
+        reasoning: reasoning
+        general: general
+
+providers:
+  - name: local-coder
+    kind: openai_compat
+    base_url: http://127.0.0.1:8081/v1
+    model: ""
+    timeout_s: 120
+
+  - name: local-reasoner
+    kind: openai_compat
+    base_url: http://127.0.0.1:8082/v1
+    model: ""
+    timeout_s: 180
+
+profiles:
+  - name: coding
+    providers: [local-coder]
+  - name: reasoning
+    providers: [local-reasoner, local-coder]
+  - name: general
+    providers: [local-coder]
+
+default_profile: coding
