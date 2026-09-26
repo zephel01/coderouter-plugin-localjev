@@ -1,0 +1,64 @@
+# ============================================================
+# OS / editor
+# ============================================================
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+*.swp
+*~
+.idea/
+.vscode/
+
+# ============================================================
+# Secrets — never commit
+# ============================================================
+.env
+.env.*
+!.env.example
+*.bak
+
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Packaging
+build/
+dist/
+wheels/
+*.egg-info/
+*.egg
+.eggs/
+
+# Virtual environments
+.venv/
+.venv-*/
+venv/
+env/
+
+# Tool caches
+.pytest_cache/
+pytest-cache-files-*/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# uv (library: lockfile not tracked)
+uv.lock
+
+# ============================================================
+# Local work
+# ============================================================
+_OUTPUTS/
+_to_delete/
+.claude/
+CLAUDE.md
+*.log
